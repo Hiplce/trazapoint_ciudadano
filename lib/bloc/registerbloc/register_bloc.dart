@@ -21,7 +21,7 @@ class RegisterBloc extends Bloc<RegisterEvent,RegisterState> {
     final debounceStream = events.where((event) {
       return(event is EmailChanged || event is PasswordChanged);
     }).debounceTime(Duration(milliseconds: 300));
-    return super.transformEvents(events, transitionFn);
+    return super.transformEvents(nonDebounceStream.mergeWith([debounceStream]), transitionFn);
   }
 
   @override

@@ -4,7 +4,7 @@ import 'package:trazapoint_ciudadano/RegisterButton.dart';
 import 'package:trazapoint_ciudadano/bloc/authenticationbloc/authentication_bloc.dart';
 import 'package:trazapoint_ciudadano/bloc/authenticationbloc/authentication_event.dart';
 import 'package:trazapoint_ciudadano/bloc/registerbloc/bloc.dart';
-import 'package:bloc/bloc.dart';
+
 class RegisterForm extends StatefulWidget {
   @override
   _RegisterFormState createState() => _RegisterFormState();
