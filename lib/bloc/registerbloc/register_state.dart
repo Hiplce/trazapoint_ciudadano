@@ -11,6 +11,8 @@ class RegisterState{
 
   bool get isFormValid => isEmailValid && isPasswordValid;
 
+
+
   RegisterState({@required this.isEmailValid, @required this.isPasswordValid,@required this.isFailure, @required this.isSubmitting, @required this.isSuccess});
 
 

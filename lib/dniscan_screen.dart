@@ -3,15 +3,23 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
+import 'package:trazapoint_ciudadano/completeregister_form.dart';
 import 'package:trazapoint_ciudadano/user_repository.dart';
+import 'file:///C:/Users/aguch/StudioProjects/trazapoint_ciudadano/lib/completeregister_screen.dart';
 
 
 class DniScanScreen extends StatefulWidget {
   UserRepository _userRepository;
+  String _email;
+  String _password;
 
-  DniScanScreen({Key key,@required UserRepository userRepository}):
+  DniScanScreen({Key key,@required UserRepository userRepository,@required String email,@required String password}):
         assert(userRepository != null),
+        assert(email != null),
+        assert(password != null),
         _userRepository = userRepository,
+        _email = email,
+        _password = password,
         super(key: key);
   @override
   _DniScanScreenState createState() => _DniScanScreenState();
@@ -19,6 +27,8 @@ class DniScanScreen extends StatefulWidget {
 
 class _DniScanScreenState extends State<DniScanScreen> {
   UserRepository get _userRepository => widget._userRepository;
+  String get _email => widget._email;
+  String get _password => widget._password;
   String res;
 
   bool isNumeric(String str) {
@@ -32,6 +42,9 @@ class _DniScanScreenState extends State<DniScanScreen> {
   }
 
   Future _scanQR() async {
+    String nombre;
+    String apellido;
+    String dni;
     try {
 
         ScanResult res = await BarcodeScanner.scan();
@@ -41,9 +54,6 @@ class _DniScanScreenState extends State<DniScanScreen> {
         var algo = isNumeric(aux[1]);
         //print(algo);
         var datos;
-        String nombre;
-        String apellido;
-        String dni;
         if (!isNumeric(aux[1])) {
           datos = "Apellido: " + aux[1] + "\n" +
               "Nombre: " + aux[2] + "\n" +
@@ -80,9 +90,10 @@ class _DniScanScreenState extends State<DniScanScreen> {
         res = "Unknown Error $ex";
       });
     }
+    if(nombre == null || apellido == null || dni == null) return;
     Navigator.of(context).push(
         MaterialPageRoute(builder: (context) {
-          return DniScanScreen(userRepository: _userRepository,);
+          return CompleteRegisterScreen(userRepository: _userRepository,name: nombre,lastname: apellido,dni: dni,email: _email,password: _password, );
         }));
   }
 

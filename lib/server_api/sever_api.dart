@@ -23,7 +23,7 @@ abstract class TrazaService extends ChopperService {
 
   static getClient() {
     final chopper = ChopperClient(
-      baseUrl: "trak.trazapoint.com.ar",
+      baseUrl: "http://www.track.trazapoint.com.ar",
       services: {
         TrazaService.create()
       }

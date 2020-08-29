@@ -11,11 +11,11 @@ class Validator {
   );
 
   static final RegExp _DirectionRegExp = RegExp(
-  r'^[A-Za-z],.$'
+  r'^A-Za-z,.$'
   );
 
   static final RegExp _LocationRegExp = RegExp(
-      r'[A-Za-z],.$'
+      r'A-Za-z,.$'
   );
   static final RegExp _PhoneRegExp = RegExp(
       r'[0-9]$'
@@ -29,10 +29,12 @@ class Validator {
     return _passwordRegExp.hasMatch(password);
   }
   static isValidLocation(String location){
-    return _LocationRegExp.hasMatch(location);
+    //return _LocationRegExp.hasMatch(location);
+    return true;
   }
   static isValidDirection(String direction){
-    return _DirectionRegExp.hasMatch(direction);
+    //return _DirectionRegExp.hasMatch(direction);
+    return true;
   }
   static isValidPhone(String phone){
     return _PhoneRegExp.hasMatch(phone);

@@ -1,4 +1,6 @@
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trazapoint_ciudadano/LoginScreen.dart';
@@ -10,9 +12,10 @@ import 'package:trazapoint_ciudadano/home_screen.dart';
 import 'package:trazapoint_ciudadano/splash_screen.dart';
 import 'package:trazapoint_ciudadano/user_repository.dart';
 
-void main(){
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AuthenticationBlocDelegate();
+  await Firebase.initializeApp();
   final UserRepository userRepository = UserRepository();
   runApp(
       BlocProvider(

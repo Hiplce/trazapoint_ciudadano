@@ -50,7 +50,8 @@ class DataRegisterBloc extends Bloc<DataRegisterEvent,DataRegisterState> {
       await _userRepository.insertUser(email, password,name,lastname,dni,location,direction,phone);
       yield DataRegisterState.success();
     }
-    catch(_){
+    catch(e){
+      print(e);
       yield DataRegisterState.failure();
     }
   }

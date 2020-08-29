@@ -15,7 +15,7 @@ class RegisterButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(30)
       ),
       onPressed: _onPressed,
-      child: Text("Register"),
+      child: Text("Siguiente"),
     );
   }
 }

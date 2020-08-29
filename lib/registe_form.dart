@@ -4,8 +4,17 @@ import 'package:trazapoint_ciudadano/RegisterButton.dart';
 import 'package:trazapoint_ciudadano/bloc/authenticationbloc/authentication_bloc.dart';
 import 'package:trazapoint_ciudadano/bloc/authenticationbloc/authentication_event.dart';
 import 'package:trazapoint_ciudadano/bloc/registerbloc/bloc.dart';
+import 'package:trazapoint_ciudadano/dniscan_screen.dart';
+import 'package:trazapoint_ciudadano/user_repository.dart';
 
 class RegisterForm extends StatefulWidget {
+  UserRepository _userRepository;
+
+  RegisterForm({Key key,@required UserRepository userRepository}):
+        assert(userRepository != null),
+        _userRepository = userRepository,
+        super(key: key);
+
   @override
   _RegisterFormState createState() => _RegisterFormState();
 }
@@ -13,6 +22,7 @@ class RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<RegisterForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+  UserRepository get _userRepository => widget._userRepository;
 
   RegisterBloc _registerBloc;
 
@@ -80,8 +90,11 @@ class _RegisterFormState extends State<RegisterForm> {
              );
          }
          if(state.isSuccess){
-           BlocProvider.of<AuthenticationBloc>(context).add(LoggedIn());
-           Navigator.of(context).pop();
+           //BlocProvider.of<AuthenticationBloc>(context).add(LoggedIn());
+           //Navigator.of(context).pop();
+           Navigator.of(context).push(MaterialPageRoute(builder: (context){
+             return DniScanScreen(userRepository: _userRepository,email: _emailController.text,password: _passController.text,);
+           }));
 
          }
       },

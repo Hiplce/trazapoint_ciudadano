@@ -32,6 +32,7 @@ dependencies:
   barcode_scan:
   http:
   path_provider:
+  firebase_core:
   firebase_auth:
   google_sign_in:
   rxdart:
