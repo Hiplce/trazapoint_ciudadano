@@ -8,21 +8,19 @@ import 'package:trazapoint_ciudadano/user_repository.dart';
 
 class CompleteRegisterForm extends StatefulWidget {
 
-  String _nombre;
-  String _apellido;
-  String _dni;
-  String _email;
-  String _password;
-  UserRepository _userRepository;
+  final String _nombre;
+  final String _apellido;
+  final String _dni;
+  final String _email;
+  final String _password;
 
-  CompleteRegisterForm({Key key,@required UserRepository userRepository,@required String nombre,@required String email,@required String password, @required String apellido,@required String dni}):
-        assert(userRepository != null),
+
+  CompleteRegisterForm({Key key,@required String nombre,@required String email,@required String password, @required String apellido,@required String dni}):
         assert(nombre != null),
         assert(apellido != null),
         assert(dni != null),
         assert(email != null),
         assert(password != null),
-        _userRepository = userRepository,
         _nombre = nombre,
         _apellido = apellido,
         _dni = dni,
@@ -121,7 +119,7 @@ class _CompleteRegisterFormState extends State<CompleteRegisterForm> {
             if(state.isSuccess){
               BlocProvider.of<AuthenticationBloc>(context).add(LoggedIn());
               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {
-              return HomeScreen(name: _nombre,);}),
+              return HomeScreen(name: _email,);}),
               (route) => false);
 
             }

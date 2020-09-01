@@ -6,11 +6,11 @@ import 'package:trazapoint_ciudadano/user_repository.dart';
 
 class CompleteRegisterScreen extends StatelessWidget {
   final UserRepository _userRepository;
-  String _email;
-  String _password;
-  String _name;
-  String _lastname;
-  String _dni;
+  final String _email;
+  final String _password;
+  final String _name;
+  final String _lastname;
+  final String _dni;
 
   CompleteRegisterScreen({Key key,@required UserRepository userRepository,@required String email,@required String password, @required String name, @required String lastname,@required String dni})
   :assert (userRepository != null),
@@ -35,7 +35,7 @@ class CompleteRegisterScreen extends StatelessWidget {
       body: Center(
         child: BlocProvider(
           create: (context) => DataRegisterBloc(userRepository: _userRepository),
-          child: CompleteRegisterForm(userRepository: _userRepository,nombre: _name,apellido: _lastname,dni: _dni,email: _email,password: _password,),
+          child: CompleteRegisterForm(nombre: _name,apellido: _lastname,dni: _dni,email: _email,password: _password,),
         ),
       ),
     );

@@ -1,0 +1,271 @@
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trazapoint_ciudadano/bloc/trazabloc/bloc.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:trazapoint_ciudadano/traza_repository.dart';
+import 'package:trazapoint_ciudadano/user_repository.dart';
+
+class TrazaEnv extends StatefulWidget {
+  final UserRepository _userRepository;
+  final TrazaRepository _trazaRepository;
+  final String _nombre;
+  TrazaEnv({Key key,@required UserRepository userRepository,@required TrazaRepository trazaRepository,@required String email})
+  :assert(userRepository != null),
+  assert(trazaRepository != null),
+  assert(trazaRepository != null),
+  _userRepository = userRepository,
+  _trazaRepository = trazaRepository,
+  _nombre = email,
+  super(key: key);
+  @override
+  _TrazaEnvState createState() => _TrazaEnvState();
+}
+
+class _TrazaEnvState extends State<TrazaEnv> {
+
+  UserRepository get _userRepository => widget._userRepository;
+  TrazaRepository get _trazaRepository => widget._trazaRepository;
+  String get _nombre => widget._nombre;
+  String res;
+  String dni = "";
+  void set _nombre(String nombre){
+    _nombre = nombre;
+  }
+  @override
+  void initState() {
+    super.initState();
+    //_getDni(_nombre);
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<TrazaBloc,TrazaState>(
+      listener: (context,state){
+        if(state.isFailure){
+          showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                backgroundColor: Colors.red,
+                title: Text("Rechazado!"),
+                content: Text("No se ha podido registrar sus datos de trazabilidad, revise su conexion e intente nuevamente"),
+                actions: [
+                  FlatButton(
+                    child: Text("OK"),
+                    onPressed:(){ Navigator.of(context).pop();},
+                  )
+                ],
+              )
+          );
+            }
+
+            if(state.isSubmitting){
+
+              /*Scaffold.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Cargando"),
+                          CircularProgressIndicator(),
+                        ],
+                      ),
+                      backgroundColor: Colors.white,
+                    )
+                );*/
+
+            }
+            if(state.isSuccess){
+              showDialog(
+                  context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Colors.green,
+                  title: Text("Confirmado!"),
+                  content: Text("Ingreso/Egreso notificado con exito"),
+                  actions: [
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed:(){ Navigator.of(context).pop();},
+                    )
+                  ],
+                )
+              );
+            }
+            if(state.isOnLocal){
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: Colors.yellow,
+                    title: Text("En Dispositivo!"),
+                    content: Text("Los datos de trazabilidad se han guardado en el dispositivo, porfavor sincronice los datos cuando disponga de internet"),
+                    actions: [
+                      FlatButton(
+                        child: Text("OK"),
+                        onPressed:(){ Navigator.of(context).pop();},
+                      )
+                    ],
+                  )
+              );
+
+            }
+            },
+      child:Container(
+        child: Column(
+
+            children: [
+              Image.asset('assets/fty.png',height: 100,),
+               Text(
+                "Bienvenido",
+                style: new TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+            ),
+
+              SizedBox(
+                height: 30,
+              ),
+              RaisedButton(
+                  shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30)
+                ),
+                  onPressed: () async {
+                    var connectivity = await (Connectivity().checkConnectivity());
+                    if (connectivity == ConnectivityResult.mobile || connectivity == ConnectivityResult.wifi ) {
+                      List<String> res = await _trazaRepository.readTraza();
+                      for (String s in res) {
+                        var splitting = s.split('|');
+                        if(splitting[1] == null && splitting[1] != "") {
+                          _trazaRepository.insertTraza(
+                              splitting[1], splitting[0], splitting[2]);
+                        }else{
+                          String email = await _userRepository.readUser();
+                          _trazaRepository.insertTraza(email, splitting[0], splitting[2]);
+                        }
+
+                      }
+                      _trazaRepository.deleteFile();
+                      return showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.green,
+                            title: Text("Sincronizado!!"),
+                            content: Text("La sincronizacion fue realizada con exito"),
+                            actions: [
+                              FlatButton(
+                                child: Text("OK"),
+                                onPressed:(){ Navigator.of(context).pop();},
+                              )
+                            ],
+                          )
+                      );
+                    }
+
+                    else {
+                      return showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.red,
+                            title: Text("Rechazado!"),
+                            content: Text("Revise su conexion de internet antes de realizar la sincronizacion"),
+                            actions: [
+                              FlatButton(
+                                child: Text("OK"),
+                                onPressed:(){ Navigator.of(context).pop();},
+                              )
+                            ],
+                          )
+                      );
+                    }
+                },
+                child: Text("Sincronizar"),
+                ),
+              SizedBox(
+                height: 40,
+              ),
+              RaisedButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)
+                ),
+                onPressed: _scanQR,
+                child: Text("Escanee Comercio"),
+              )
+            ] ,
+          ),
+      ),
+
+    );
+
+
+  }
+  Future _scanQR() async {
+
+    try {
+
+      String qrResult = "";
+
+      ScanResult res = await BarcodeScanner.scan();
+      qrResult = res.rawContent;
+      print("paso por aca");
+      if(_nombre == null) {
+        _nombre = await _userRepository.getUser();
+        print("paso por aca");
+      }
+      print("saco el usuario");
+      print(_nombre);
+
+      var connectivity = await (Connectivity().checkConnectivity());
+      if((qrResult != null && qrResult != "") && _nombre != null && dni != null ){
+        if (connectivity == ConnectivityResult.mobile || connectivity == ConnectivityResult.wifi ) {
+        print("hay Internet");
+        BlocProvider.of<TrazaBloc>(context).add(SaveOnServer(localid: qrResult,
+            dni: _nombre,
+            date: DateTime.now().toString().substring(0, 19)));
+
+      }
+        if (connectivity == ConnectivityResult.none ){
+          print("no hay Internter");
+          BlocProvider.of<TrazaBloc>(context).add(SaveOnLocal(localid: qrResult,
+              dni: _nombre,
+              date: DateTime.now().toString().substring(0, 19)));
+        }
+      }
+
+
+    } on PlatformException catch (ex) {
+      if (ex.code == BarcodeScanner.cameraAccessDenied) {
+        print("no hay permiso");
+      } else {
+        setState(() {
+          res = "Unknown Error $ex";
+        });
+      }
+    } on FormatException {
+
+        print("volvio");
+
+    } catch (ex) {
+
+        print("La flasho $ex");
+
+         return showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                backgroundColor: Colors.red,
+                title: Text("Rechazado!"),
+                content: Text("No se ha podido registrar sus datos de trazabilidad, revise su conexion e intente nuevamente"),
+                actions: [
+                  FlatButton(
+                    child: Text("OK"),
+                    onPressed:(){ Navigator.of(context).pop();},
+                  )
+                ],
+              )
+          );
+
+
+    }
+
+  }
+}

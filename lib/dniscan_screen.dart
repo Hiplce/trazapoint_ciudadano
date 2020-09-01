@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
-import 'package:trazapoint_ciudadano/completeregister_form.dart';
+import 'package:trazapoint_ciudadano/completeregister_screen.dart';
 import 'package:trazapoint_ciudadano/user_repository.dart';
-import 'file:///C:/Users/aguch/StudioProjects/trazapoint_ciudadano/lib/completeregister_screen.dart';
+
 
 
 class DniScanScreen extends StatefulWidget {
-  UserRepository _userRepository;
-  String _email;
-  String _password;
+  final UserRepository _userRepository;
+  final String _email;
+  final String _password;
 
   DniScanScreen({Key key,@required UserRepository userRepository,@required String email,@required String password}):
         assert(userRepository != null),
@@ -101,17 +101,17 @@ class _DniScanScreenState extends State<DniScanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("QR Scanner"),
+        title: Text("Scanear Documento"),
       ),
       body: Center(
         child: Text(
           "Scanee el codigo de barras de su dni para continuar",
-          style: new TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+          style: new TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),textAlign: TextAlign.center,
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: Icon(Icons.camera_alt),
-        label: Text("Scan"),
+        label: Text("Scanear"),
         onPressed: _scanQR,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

@@ -107,19 +107,19 @@ class _LoginFormState extends State<LoginForm> {
               child: ListView(
                 children: [
                   Padding(padding: EdgeInsets.symmetric(vertical: 20),
-                  //falta imagen
+                  child: Image.asset('assets/fty.png',height: 120,),
                   ),
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       icon: Icon(Icons.email),
-                      labelText: "email"
+                      labelText: "Email"
                     ),
                     keyboardType: TextInputType.emailAddress,
                     autovalidate: true,
                     autocorrect: false,
                     validator: (_) {
-                      return !state.isEmailValid? "invalid Email" : null;
+                      return !state.isEmailValid? "Email invalido" : null;
                     },
                   ),
                   TextFormField(
@@ -132,7 +132,7 @@ class _LoginFormState extends State<LoginForm> {
                     autovalidate: true,
                     autocorrect: false,
                     validator: (_) {
-                      return !state.isPasswordValid? "invalid Password" : null;
+                      return !state.isPasswordValid? "Contraseña invalida" : null;
                     },
                   ),
                   Padding(

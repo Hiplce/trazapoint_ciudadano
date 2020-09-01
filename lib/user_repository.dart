@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:core';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:trazapoint_ciudadano/server_api/sever_api.dart';
-
+import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 
 class UserRepository {
   final FirebaseAuth _firebaseAuth;
@@ -33,15 +36,65 @@ class UserRepository {
   }
 
   Future<void> insertUser(String email, String password,String name,String lastname,String dni,String location,String direction,String phone) async {
-    var client = TrazaService.getClient();
+    //var client = TrazaService.getClient();
     String body = email + '|' + password + '|' + name + '|' + lastname + '|' + dni + '|' + location + '|' + direction + '|' + phone;
-    return await client.insertPersona(body);
+    //return await client.insertPersona(body);
+    String apiUrl = "http://www.track.trazapoint.com.ar/traza_ciuda.php";
+    Response response;
 
+    try{
+      print("entre");
+      response = await http.post(apiUrl,body: body );
+      print(response.body);
+      if (response.statusCode == 200){
+        print("tamo de vielta");
+      }
+      if ((response.statusCode != 200 && response.statusCode != 201) || response.body == "false"){
+        throw Exception();
+      }
+    }
+    catch(e){
+      print("pero exploto");
+      throw Exception();
+    }
   }
-  Future<void> insertTraza(String dni,String idlocal) async {
-    var client = TrazaService.getClient();
-    String body = idlocal + '|' + dni + '|' + DateTime.now().toString().substring(0, 19);
-    return await client.insertTraza(body);
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
 
+    return directory.path;
   }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    print("esta es la ruta");
+    print(path);
+    return File('$path/usuario.txt');
+  }
+  Future<File> writeUser(String counter) async {
+    final file = await _localFile;
+    return file.writeAsString(counter);
+  }
+  Future<String> readUser() async {
+    try {
+      final file = await _localFile;
+
+      String contents = await file.readAsString();
+      print(contents);
+
+      return contents;
+    } catch (e) {
+      // If we encounter an error, return 0
+      return "";
+    }
+  }
+  Future<int> deleteFile() async {
+    try {
+      final file = await _localFile;
+
+      await file.delete();
+    } catch (e) {
+      return 0;
+    }
+  }
+
 }

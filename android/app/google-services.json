@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:848172994561:android:8fdba1ce2424d71309f000",
+        "mobilesdk_app_id": "1:848172994561:android:6e776d017308d18209f000",
         "android_client_info": {
-          "package_name": "com.example.trazapoint_ciudadano"
+          "package_name": "com.traza.trazaciudad"
         }
       },
       "oauth_client": [
         {
-          "client_id": "848172994561-tojg5lmkrsc597spcu2flmifv9lrkcpl.apps.googleusercontent.com",
+          "client_id": "848172994561-p85jv242bh787k52m25278v2j0afpn2i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.trazapoint_ciudadano",
+            "package_name": "com.traza.trazaciudad",
             "certificate_hash": "baa6808753499fd95e0ac7fa4862df352eefb1a2"
           }
         },

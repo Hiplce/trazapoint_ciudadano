@@ -6,7 +6,13 @@ class SplashScreen extends StatelessWidget{
     // TODO: implement build
     return Scaffold(
       body: Center(
-        child: Text( "HOlis"),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/fty.png',height: 150,),
+            CircularProgressIndicator()
+          ],
+        ),
       ),
     );
   }

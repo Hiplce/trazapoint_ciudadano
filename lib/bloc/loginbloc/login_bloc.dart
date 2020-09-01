@@ -41,7 +41,7 @@ class LoginBloc extends Bloc<LoginEvent,LoginState>{
      yield state.update(isEmailValid: Validator.isValidEmail(email));
   }
    Stream<LoginState> _mapPasswordChangedToState(String password) async* {
-     yield state.update(isEmailValid: Validator.isValidPassword(password));
+     yield state.update(isPasswordValid: Validator.isValidPassword(password));
    }
 
    Stream<LoginState> _mapLogginPressToState({String email, String password}) async* {

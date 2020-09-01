@@ -48,7 +48,7 @@ class RegisterBloc extends Bloc<RegisterEvent,RegisterState> {
   Stream<RegisterState> _mapSubmittedToState(String email, String password)  async*{
     yield RegisterState.loading();
     try{
-      await _userRepository.singUp(email, password);
+      //await _userRepository.singUp(email, password);
       yield RegisterState.success();
     }
     catch(_){

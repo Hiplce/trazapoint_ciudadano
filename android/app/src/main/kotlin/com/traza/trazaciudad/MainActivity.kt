@@ -1,4 +1,4 @@
-package com.example.trazapoint_ciudadano
+package com.traza.trazaciudad
 
 import io.flutter.embedding.android.FlutterActivity
 

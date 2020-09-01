@@ -13,13 +13,13 @@ abstract class TrazaService extends ChopperService {
       _$TrazaService(client);
 
   @Post(path: '/traza_ciudadano.php')
-  Future<Response> insertPersona(@Body() String body);
+  Future<Response> insertPersona(String body);
 
   @Post(path: '/traza_traza.php')
-  Future<Response> insertTraza(@Body() String body);
+  Future<Response> insertTraza(String body);
 
   @Get(path: '/traza_persona.php')
-  Future<Response> getPersona(@Body() String email);
+  Future<Response> getPersona(String email);
 
   static getClient() {
     final chopper = ChopperClient(

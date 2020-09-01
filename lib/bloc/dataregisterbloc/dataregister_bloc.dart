@@ -47,6 +47,7 @@ class DataRegisterBloc extends Bloc<DataRegisterEvent,DataRegisterState> {
   Stream<DataRegisterState>_mapSubmittedToState(String email,String password,String name,String lastname,String dni,String location,String direction,String phone) async* {
     yield DataRegisterState.loading();
     try{
+      await _userRepository.singUp(email, password);
       await _userRepository.insertUser(email, password,name,lastname,dni,location,direction,phone);
       yield DataRegisterState.success();
     }

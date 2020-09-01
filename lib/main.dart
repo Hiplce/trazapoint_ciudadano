@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "hola",
+      title: "Trazaciuda",
       home: BlocBuilder<AuthenticationBloc,AuthenticationState>(
         builder:  (context,state){
 
