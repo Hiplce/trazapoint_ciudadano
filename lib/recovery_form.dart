@@ -1,60 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trazapoint_ciudadano/LoginScreen.dart';
 import 'package:trazapoint_ciudadano/RegisterButton.dart';
-import 'package:trazapoint_ciudadano/bloc/registerbloc/bloc.dart';
-import 'package:trazapoint_ciudadano/dniscan_screen.dart';
+import 'package:trazapoint_ciudadano/bloc/recoverypassbloc/bloc.dart';
 import 'package:trazapoint_ciudadano/user_repository.dart';
 
-class RegisterForm extends StatefulWidget {
+class RecoveryForm extends StatefulWidget {
   UserRepository _userRepository;
 
-  RegisterForm({Key key,@required UserRepository userRepository}):
+  RecoveryForm({Key key,@required UserRepository userRepository}):
         assert(userRepository != null),
         _userRepository = userRepository,
         super(key: key);
 
   @override
-  _RegisterFormState createState() => _RegisterFormState();
+  _RecoveryFormState createState() => _RecoveryFormState();
 }
 
-class _RegisterFormState extends State<RegisterForm> {
+class _RecoveryFormState extends State<RecoveryForm> {
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
+
   UserRepository get _userRepository => widget._userRepository;
 
-  RegisterBloc _registerBloc;
+  RecoveryBloc _recoveryBloc;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _registerBloc = BlocProvider.of<RegisterBloc>(context);
+    _recoveryBloc = BlocProvider.of<RecoveryBloc>(context);
     _emailController.addListener(_onEmailChanged);
-    _passController.addListener(_onPassChanged);
-  }
-  bool get isPopulated => _emailController.text.isNotEmpty && _passController.text.isNotEmpty;
 
-  bool isRegisterButtonEnabled(RegisterState state) {
+  }
+  bool get isPopulated => _emailController.text.isNotEmpty ;
+
+  bool isRegisterButtonEnabled(RecoveryState state) {
     return state.isFormValid && isPopulated && !state.isSubmitting;
   }
 
   void _onEmailChanged(){
-    _registerBloc.add(EmailChanged(email: _emailController.text));
-  }
-  void _onPassChanged(){
-    _registerBloc.add(PasswordChanged(password: _passController.text));
+    _recoveryBloc.add(EmailChanged(email: _emailController.text));
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     _emailController.dispose();
-    _passController.dispose();
     super.dispose();
   }
   @override
   Widget build(BuildContext context) {
-    return BlocListener<RegisterBloc,RegisterState>(
+    return BlocListener<RecoveryBloc,RecoveryState>(
       listener: (context,state){
          if(state.isSubmitting){
            Scaffold.of(context)
@@ -64,7 +60,7 @@ class _RegisterFormState extends State<RegisterForm> {
                    content: Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                      children: [
-                       Text("Registrando"),
+                       Text("Enviando confirmacion..."),
                        CircularProgressIndicator()
                      ],
                    ),
@@ -79,7 +75,7 @@ class _RegisterFormState extends State<RegisterForm> {
                    content: Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                      children: [
-                       Text("Registro fallido"),
+                       Text("Recuperacion fallida"),
                        Icon(Icons.error)
                      ],
                    ),
@@ -89,14 +85,32 @@ class _RegisterFormState extends State<RegisterForm> {
          }
          if(state.isSuccess){
            //BlocProvider.of<AuthenticationBloc>(context).add(LoggedIn());
-           //Navigator.of(context).pop();
-           Navigator.of(context).push(MaterialPageRoute(builder: (context){
-             return DniScanScreen(userRepository: _userRepository,email: _emailController.text,password: _passController.text,);
-           }));
+
+           Navigator.of(context).pop();
+           showDialog(
+               context: context,
+               builder: (context) => AlertDialog(
+                 backgroundColor: Colors.yellow,
+                 title: Text("Recuperada!"),
+                 content: Text("Se ha enviado un email a ${_emailController.text} para recuperar su contraseña revise su casilla de correos"),
+                 actions: [
+                   FlatButton(
+                     child: Text("OK"),
+                     onPressed:(){
+                       Navigator.of(context).pop();
+                       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context){
+                         return LogginScreen(userRepository: _userRepository,);
+                       }),(Route<dynamic> route) => false);
+                       },
+                   )
+                 ],
+               )
+           );
+
 
          }
       },
-      child: BlocBuilder<RegisterBloc,RegisterState>(
+      child: BlocBuilder<RecoveryBloc,RecoveryState>(
         builder: (context,state) {
           return Padding(
             padding: EdgeInsets.all(20),
@@ -116,24 +130,12 @@ class _RegisterFormState extends State<RegisterForm> {
                       return !state.isEmailValid? "Email invalido" : null;
                     },
                   ),
-                  TextFormField(
-                    controller: _passController,
-                    decoration: InputDecoration(
-
-                        icon: Icon(Icons.lock),
-                        labelText: "Contraseña",
+                  RaisedButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)
                     ),
-                    obscureText: true,
-                    autovalidate: true,
-                    autocorrect: false,
-                    validator: (_) {
-                      return !state.isPasswordValid? "Contraseña invalida" : null;
-                    },
-                  ),
-                  RegisterButton(
-                    onPressed: isRegisterButtonEnabled(state)
-                        ? _onFormSubmitted
-                    : null,
+                    onPressed: _onFormSubmitted,
+                    child: Text("Recuperar"),
                   )
                 ],
               ),
@@ -145,10 +147,9 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   void _onFormSubmitted() {
-    _registerBloc.add(
+    _recoveryBloc.add(
         Submitted(
           email: _emailController.text,
-          password: _passController.text
         ));
   }
 }

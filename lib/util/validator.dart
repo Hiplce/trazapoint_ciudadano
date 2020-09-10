@@ -26,7 +26,7 @@ class Validator {
   }
 
   static isValidPassword(String password){
-    return _passwordRegExp.hasMatch(password);
+    return true; //_passwordRegExp.hasMatch(password);
   }
   static isValidLocation(String location){
     //return _LocationRegExp.hasMatch(location);

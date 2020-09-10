@@ -34,12 +34,16 @@ class UserRepository {
   Future<String> getUser() async {
     return await _firebaseAuth.currentUser.email;
   }
+  Future resetPass(String email) async{
+    return await _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
 
   Future<void> insertUser(String email, String password,String name,String lastname,String dni,String location,String direction,String phone) async {
     //var client = TrazaService.getClient();
     String body = email + '|' + password + '|' + name + '|' + lastname + '|' + dni + '|' + location + '|' + direction + '|' + phone;
     //return await client.insertPersona(body);
-    String apiUrl = "http://www.track.trazapoint.com.ar/traza_ciuda.php";
+    //String apiUrl = "www.qr.trazapoint.com.ar/test_traza_ciuda.php";  //pruebas
+    String apiUrl = "http://www.track.trazapoint.com.ar/traza_ciuda.php"; // produccion
     Response response;
 
     try{

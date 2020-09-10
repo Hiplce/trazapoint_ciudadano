@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +13,7 @@ class TrazaEnv extends StatefulWidget {
   final UserRepository _userRepository;
   final TrazaRepository _trazaRepository;
   final String _nombre;
+  String qrResult;
   TrazaEnv({Key key,@required UserRepository userRepository,@required TrazaRepository trazaRepository,@required String email})
   :assert(userRepository != null),
   assert(trazaRepository != null),
@@ -133,33 +136,69 @@ class _TrazaEnvState extends State<TrazaEnv> {
                   onPressed: () async {
                     var connectivity = await (Connectivity().checkConnectivity());
                     if (connectivity == ConnectivityResult.mobile || connectivity == ConnectivityResult.wifi ) {
-                      List<String> res = await _trazaRepository.readTraza();
-                      for (String s in res) {
-                        var splitting = s.split('|');
-                        if(splitting[1] == null && splitting[1] != "") {
-                          _trazaRepository.insertTraza(
-                              splitting[1], splitting[0], splitting[2]);
-                        }else{
-                          String email = await _userRepository.readUser();
-                          _trazaRepository.insertTraza(email, splitting[0], splitting[2]);
+                      try {
+                        final result = await InternetAddress.lookup('google.com.ar');
+                        print(result);
+                        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                          List<String> res = await _trazaRepository.readTraza();
+                          int asd = 0;
+                          for (String s in res) {
+                            var splitting = s.split('|');
+                            Future.delayed(const Duration(milliseconds: 500), () async {
+                              print("iteracion numero: \n");
+                              print(asd);
+                              if (splitting[1] == null && splitting[1] != "") {
+                                _trazaRepository.insertTraza(
+                                    splitting[1], splitting[0], splitting[2]);
+                              } else {
+                                String email = await _userRepository.readUser();
+                                _trazaRepository.insertTraza(
+                                    email, splitting[0], splitting[2]);
+                              }
+                            });
+                            asd++;
+                          }
+                          _trazaRepository.deleteFile();
+                          return showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  AlertDialog(
+                                    backgroundColor: Colors.green,
+                                    title: Text("Sincronizado!!"),
+                                    content: Text(
+                                        "La sincronizacion fue realizada con exito"),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text("OK"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      )
+                                    ],
+                                  )
+                          );
                         }
-
                       }
-                      _trazaRepository.deleteFile();
-                      return showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            backgroundColor: Colors.green,
-                            title: Text("Sincronizado!!"),
-                            content: Text("La sincronizacion fue realizada con exito"),
-                            actions: [
-                              FlatButton(
-                                child: Text("OK"),
-                                onPressed:(){ Navigator.of(context).pop();},
-                              )
-                            ],
-                          )
-                      );
+                      catch(e){
+                        return showDialog(
+                            context: context,
+                            builder: (context) =>
+                                AlertDialog(
+                                  backgroundColor: Colors.red,
+                                  title: Text("No se realizo la sincronizacion!!"),
+                                  content: Text(
+                                      "Chequee su conectividad para realizar la sincronizacion de manera segura"),
+                                  actions: [
+                                    FlatButton(
+                                      child: Text("OK"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    )
+                                  ],
+                                )
+                        );
+                      }
                     }
 
                     else {
@@ -200,10 +239,11 @@ class _TrazaEnvState extends State<TrazaEnv> {
 
   }
   Future _scanQR() async {
+    String qrResult;
 
     try {
 
-      String qrResult = "";
+
 
       ScanResult res = await BarcodeScanner.scan();
       qrResult = res.rawContent;
@@ -217,19 +257,16 @@ class _TrazaEnvState extends State<TrazaEnv> {
 
       var connectivity = await (Connectivity().checkConnectivity());
       if((qrResult != null && qrResult != "") && _nombre != null && dni != null ){
-        if (connectivity == ConnectivityResult.mobile || connectivity == ConnectivityResult.wifi ) {
+        var conexion = await InternetAddress.lookup('google.com.ar');
+        print(conexion);
+        if ((connectivity == ConnectivityResult.mobile || connectivity == ConnectivityResult.wifi) && conexion.isNotEmpty && conexion[0].rawAddress.isNotEmpty) {
         print("hay Internet");
         BlocProvider.of<TrazaBloc>(context).add(SaveOnServer(localid: qrResult,
             dni: _nombre,
             date: DateTime.now().toString().substring(0, 19)));
 
-      }
-        if (connectivity == ConnectivityResult.none ){
-          print("no hay Internter");
-          BlocProvider.of<TrazaBloc>(context).add(SaveOnLocal(localid: qrResult,
-              dni: _nombre,
-              date: DateTime.now().toString().substring(0, 19)));
         }
+
       }
 
 
@@ -248,21 +285,34 @@ class _TrazaEnvState extends State<TrazaEnv> {
     } catch (ex) {
 
         print("La flasho $ex");
+        try{
 
-         return showDialog(
+            print("no hay Internter");
+            BlocProvider.of<TrazaBloc>(context).add(SaveOnLocal(localid: qrResult,
+                dni: _nombre,
+                date: DateTime.now().toString().substring(0, 19)));
+
+        }
+        catch(e) {
+          return showDialog(
               context: context,
-              builder: (context) => AlertDialog(
-                backgroundColor: Colors.red,
-                title: Text("Rechazado!"),
-                content: Text("No se ha podido registrar sus datos de trazabilidad, revise su conexion e intente nuevamente"),
-                actions: [
-                  FlatButton(
-                    child: Text("OK"),
-                    onPressed:(){ Navigator.of(context).pop();},
+              builder: (context) =>
+                  AlertDialog(
+                    backgroundColor: Colors.red,
+                    title: Text("Rechazado!"),
+                    content: Text(
+                        "No se ha podido registrar sus datos de trazabilidad, revise su conexion e intente nuevamente"),
+                    actions: [
+                      FlatButton(
+                        child: Text("OK"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ],
                   )
-                ],
-              )
           );
+        }
 
 
     }

@@ -5,6 +5,7 @@ import 'package:trazapoint_ciudadano/bloc/authenticationbloc/authentication_even
 import 'package:trazapoint_ciudadano/bloc/loginbloc/bloc.dart';
 import 'package:trazapoint_ciudadano/create_account_button.dart';
 import 'package:trazapoint_ciudadano/login_button.dart';
+import 'package:trazapoint_ciudadano/recoverypassbutton.dart';
 import 'package:trazapoint_ciudadano/user_repository.dart';
 
 class LoginForm extends StatefulWidget {
@@ -141,7 +142,8 @@ class _LoginFormState extends State<LoginForm> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         LoginButton(onPressed: isLoginButtonEnabled(state)? _onFormSubmitted : null ,),
-                        CreateAcountButton(userRepository : _userRepository)
+                        CreateAcountButton(userRepository : _userRepository),
+                        RecoveryPassButton(userRepository : _userRepository)
                       ],
                     ),
                   )

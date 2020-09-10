@@ -67,7 +67,8 @@ class TrazaRepository {
 
   Future<void> insertTraza(String email,String idlocal,String date) async {
     //var client = TrazaService.getClient();
-    String apiUrl = "http://www.track.trazapoint.com.ar/traza_trazabi.php";
+    //String apiUrl = "www.qr.trazapoint.com.ar/test_traza_trazabi.php";      // pruebas
+    String apiUrl = "http://www.track.trazapoint.com.ar/traza_trazabi.php";  //produccion
     Response resp;
     String body;
 
