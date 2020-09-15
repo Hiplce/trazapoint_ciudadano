@@ -53,6 +53,14 @@ class TrazaState {
         isOnLocal: true
     );
   }
+  factory TrazaState.unverified(){
+    return TrazaState(
+        isSubmitting: false,
+        isSuccess: false,
+        isFailure: false,
+        isOnLocal: false
+    );
+  }
 
 
 

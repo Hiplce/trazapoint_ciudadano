@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
   TrazaRepository _trazaRepository;
   String get name => widget.name;
   UserRepository _userRepository;
+
+  bool verificado;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -31,6 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
     _userRepository = UserRepository();
     _trazaRepository = TrazaRepository();
     _userRepository.writeUser(name);
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    super.dispose();
   }
 
 
@@ -63,11 +75,13 @@ class _HomeScreenState extends State<HomeScreen> {
                TrazaEnv(userRepository: _userRepository,trazaRepository: _trazaRepository, email: name,)),
 
             ]
-          )
+          ),
 
         ),
       );
   }
+
+
 
 
 }

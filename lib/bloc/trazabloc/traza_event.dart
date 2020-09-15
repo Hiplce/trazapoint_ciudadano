@@ -42,3 +42,4 @@ class SaveOnLocal extends TrazaEvent {
   String toString() => "Save on local {localid: $localid , dni: $dni , date: $date }";
 
 }
+

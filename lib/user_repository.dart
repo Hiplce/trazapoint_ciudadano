@@ -19,7 +19,13 @@ class UserRepository {
   }
 
   Future<void> singUp(String email, String password) async{
-    return await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+    final res = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+    final user = _firebaseAuth.currentUser;
+    print(user);
+    if(user != null){
+      user.sendEmailVerification();
+    }
+    return res;
   }
 
   Future<void> singOut() async {
@@ -31,10 +37,16 @@ class UserRepository {
     return currentUser != null;
   }
 
+
   Future<String> getUser() async {
     return await _firebaseAuth.currentUser.email;
   }
+
+  Future getUserData() async{
+    return await _firebaseAuth.currentUser;
+  }
   Future resetPass(String email) async{
+    
     return await _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
@@ -42,8 +54,8 @@ class UserRepository {
     //var client = TrazaService.getClient();
     String body = email + '|' + password + '|' + name + '|' + lastname + '|' + dni + '|' + location + '|' + direction + '|' + phone;
     //return await client.insertPersona(body);
-    //String apiUrl = "www.qr.trazapoint.com.ar/test_traza_ciuda.php";  //pruebas
-    String apiUrl = "http://www.track.trazapoint.com.ar/traza_ciuda.php"; // produccion
+    String apiUrl = "www.qr.trazapoint.com.ar/test_traza_ciuda.php";  //pruebas
+    //String apiUrl = "http://www.track.trazapoint.com.ar/traza_ciuda.php"; // produccion
     Response response;
 
     try{

@@ -21,6 +21,7 @@ class TrazaBloc extends Bloc<TrazaEvent,TrazaState>{
     if(event is SaveOnLocal){
       yield* _mapSaveOnLocalToState(event.localid,event.dni,event.date);
     }
+
   }
 
   Stream<TrazaState>_mapSaveOnServerToState(String localid,String dni,String date) async* {

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:connectivity/connectivity.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,12 +34,15 @@ class _TrazaEnvState extends State<TrazaEnv> {
   String get _nombre => widget._nombre;
   String res;
   String dni = "";
+  bool verificado;
   void set _nombre(String nombre){
     _nombre = nombre;
   }
   @override
-  void initState() {
+  void initState() async{
     super.initState();
+    User user = await _userRepository.getUserData();
+    verificado = user.emailVerified;
     //_getDni(_nombre);
   }
 
@@ -229,8 +233,10 @@ class _TrazaEnvState extends State<TrazaEnv> {
                 ),
                 onPressed: _scanQR,
                 child: Text("Escanee Comercio"),
-              )
+              ),
+
             ] ,
+
           ),
       ),
 
@@ -243,7 +249,17 @@ class _TrazaEnvState extends State<TrazaEnv> {
 
     try {
 
-
+      User user = await _userRepository.getUserData();
+      print("pre-reload");
+      print(user.emailVerified);
+      await user.reload();
+      user = await _userRepository.getUserData();
+      print("post-reload");
+      print(user.emailVerified);
+      if(!user.emailVerified){
+        print("algo");
+        throw UnverifiedException();
+      }
 
       ScanResult res = await BarcodeScanner.scan();
       qrResult = res.rawContent;
@@ -282,7 +298,30 @@ class _TrazaEnvState extends State<TrazaEnv> {
 
         print("volvio");
 
-    } catch (ex) {
+    }
+    on UnverifiedException {
+      print("no hago ni bosta");
+      return showDialog(
+          context: context,
+          builder: (context) =>
+              AlertDialog(
+                backgroundColor: Colors.red,
+                title: Text("Email no verificado!"),
+                content: Text(
+                    "Verifique su cuenta para acceder a trazabilidad, revise el email con el que se registro."),
+                actions: [
+                  FlatButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              )
+      );
+
+    }
+    catch (ex) {
 
         print("La flasho $ex");
         try{
@@ -318,4 +357,12 @@ class _TrazaEnvState extends State<TrazaEnv> {
     }
 
   }
+
+
+}
+class UnverifiedException implements Exception {
+  final String menssage;
+  const UnverifiedException([this.menssage = "email no verificado"]);
+  @override
+  String toString() => "UnverifiedException: $menssage";
 }
